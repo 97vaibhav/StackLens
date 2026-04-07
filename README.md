@@ -10,7 +10,7 @@ Python · JavaScript · TypeScript · Java · Go · Rust · SQL · Docker · C/C
 
 ## Quick install
 
-**Prerequisites:** Node.js 18+, Claude Desktop, Anthropic API key
+**Prerequisites:** Node.js 18+, Anthropic API key
 
 ```bash
 git clone https://github.com/97vaibhav/stacklens.git
@@ -53,6 +53,34 @@ After publishing to npm, use `npx` instead:
 ```
 
 Restart Claude Desktop. Look for the tools icon — StackLens is ready when you see `explain_error` listed.
+
+## Using with Claude Code (CLI)
+
+**Option 1 — Project-level** (copy `.mcp.json` from this repo into your project root):
+
+```bash
+cp /path/to/stacklens/.mcp.json your-project/
+```
+
+Claude Code auto-loads `.mcp.json` from the project root. Make sure `ANTHROPIC_API_KEY` is set in your shell environment.
+
+**Option 2 — Global** (available in all Claude Code sessions):
+
+```bash
+claude mcp add stacklens npx -- -y stacklens-mcp
+```
+
+Then set your key in the shell:
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Once configured, use it in Claude Code just like any other tool:
+
+```
+Use explain_error to analyze this: [paste stack trace]
+```
 
 ## Usage
 
