@@ -631,7 +631,7 @@ Python · JavaScript · TypeScript · Java · Go · Rust · SQL · Docker · C/C
 ### 1. Clone and build
 
 \`\`\`bash
-git clone https://github.com/YOUR_USERNAME/stacklens.git
+git clone https://github.com/97vaibhav/stacklens.git
 cd stacklens
 npm install
 npm run build
@@ -753,7 +753,7 @@ git add .
 git commit -m "feat: initial StackLens MCP plugin"
 gh repo create stacklens --public --push
 # OR manually:
-git remote add origin https://github.com/YOUR_USERNAME/stacklens.git
+git remote add origin https://github.com/97vaibhav/stacklens.git
 git push -u origin main
 ```
 
@@ -777,10 +777,10 @@ gh release create v1.0.0 --title "StackLens v1.0.0" --notes "Initial release"
   "keywords": ["claude", "mcp", "debugging", "stack-trace", "developer-tools"],
   "author": "YOUR_NAME",
   "license": "MIT",
-  "homepage": "https://github.com/YOUR_USERNAME/stacklens",
+  "homepage": "https://github.com/97vaibhav/stacklens",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/stacklens.git"
+    "url": "https://github.com/97vaibhav/stacklens.git"
   },
   "files": ["dist/", "README.md", "LICENSE"],
   "bin": {
@@ -846,7 +846,7 @@ Before submitting, make sure you have:
   "version": "1.0.0",
   "description": "Analyzes stack traces and error logs. Returns root cause, severity, code fix, and documentation links. Supports Python, JavaScript, Java, Go, Rust, SQL, and Docker.",
   "author": "YOUR_NAME",
-  "homepage": "https://github.com/YOUR_USERNAME/stacklens",
+  "homepage": "https://github.com/97vaibhav/stacklens",
   "install": {
     "type": "npm",
     "package": "stacklens-mcp",

@@ -13,7 +13,7 @@ Python · JavaScript · TypeScript · Java · Go · Rust · SQL · Docker · C/C
 **Prerequisites:** Node.js 18+, Claude Desktop, Anthropic API key
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/stacklens.git
+git clone https://github.com/97vaibhav/stacklens.git
 cd stacklens
 make setup
 make build
