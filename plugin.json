@@ -1,0 +1,33 @@
+{
+  "name": "StackLens",
+  "id": "stacklens",
+  "version": "1.0.0",
+  "description": "Analyzes stack traces and error logs. Returns root cause, severity, code fix, and documentation links. Supports Python, JavaScript, TypeScript, Java, Go, Rust, SQL, Docker, and C/C++.",
+  "author": "",
+  "homepage": "https://github.com/YOUR_USERNAME/stacklens",
+  "install": {
+    "type": "npm",
+    "package": "stacklens-mcp",
+    "command": "npx",
+    "args": ["-y", "stacklens-mcp"]
+  },
+  "tools": [
+    {
+      "name": "explain_error",
+      "description": "Analyzes a single stack trace or error message"
+    },
+    {
+      "name": "explain_errors_batch",
+      "description": "Analyzes up to 10 errors simultaneously"
+    }
+  ],
+  "prompts": [
+    {
+      "name": "debug",
+      "description": "Slash command to quickly explain an error"
+    }
+  ],
+  "required_env": ["ANTHROPIC_API_KEY"],
+  "categories": ["developer-tools", "debugging"],
+  "pricing": "free"
+}
