@@ -4,22 +4,19 @@
 
 StackLens is a Claude MCP plugin that analyzes any stack trace or error log and returns a structured explanation — root cause, plain-English summary, code fix, severity level, and common causes.
 
+No API key required. StackLens uses MCP sampling — it asks Claude (your existing host) to run the analysis, so it works with your existing Claude Desktop or Claude Code session.
+
 ## Supported languages
 
 Python · JavaScript · TypeScript · Java · Go · Rust · SQL · Docker · C/C++
 
 ## Quick install
 
-**Prerequisites:** Node.js 18+, Anthropic API key
+**Prerequisites:** Node.js 18+
 
-```bash
-git clone https://github.com/97vaibhav/stacklens.git
-cd stacklens
-make setup
-make build
-```
+### Claude Desktop
 
-Add to your Claude Desktop config:
+Add to your config file:
 
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
@@ -28,25 +25,8 @@ Add to your Claude Desktop config:
 {
   "mcpServers": {
     "stacklens": {
-      "command": "node",
-      "args": ["/absolute/path/to/stacklens/dist/index.js"],
-      "env": {
-        "ANTHROPIC_API_KEY": "your_key_here"
-      }
-    }
-  }
-}
-```
-
-After publishing to npm, use `npx` instead:
-
-```json
-{
-  "mcpServers": {
-    "stacklens": {
       "command": "npx",
-      "args": ["-y", "stacklens-mcp"],
-      "env": { "ANTHROPIC_API_KEY": "your_key_here" }
+      "args": ["-y", "stacklens-mcp"]
     }
   }
 }
@@ -54,33 +34,21 @@ After publishing to npm, use `npx` instead:
 
 Restart Claude Desktop. Look for the tools icon — StackLens is ready when you see `explain_error` listed.
 
-## Using with Claude Code (CLI)
+### Claude Code (CLI)
 
-**Option 1 — Project-level** (copy `.mcp.json` from this repo into your project root):
-
-```bash
-cp /path/to/stacklens/.mcp.json your-project/
-```
-
-Claude Code auto-loads `.mcp.json` from the project root. Make sure `ANTHROPIC_API_KEY` is set in your shell environment.
-
-**Option 2 — Global** (available in all Claude Code sessions):
+**Option 1 — Global** (available in all Claude Code sessions):
 
 ```bash
 claude mcp add stacklens npx -- -y stacklens-mcp
 ```
 
-Then set your key in the shell:
+**Option 2 — Project-level** (copy `.mcp.json` from this repo into your project root):
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
+cp /path/to/stacklens/.mcp.json your-project/
 ```
 
-Once configured, use it in Claude Code just like any other tool:
-
-```
-Use explain_error to analyze this: [paste stack trace]
-```
+Claude Code auto-loads `.mcp.json` from the project root.
 
 ## Usage
 
@@ -129,22 +97,29 @@ Docs: https://docs.python.org/3/library/stdtypes.html#str.upper
 
 ```bash
 make setup    # install dependencies
-make dev      # run without building (requires .env with ANTHROPIC_API_KEY)
-make test     # run against 3 real error cases (charges tokens)
+make dev      # run without building
+make test     # run against 3 real error cases (requires .env with ANTHROPIC_API_KEY)
 make build    # compile to dist/
 make lint     # type-check only
 make clean    # remove dist/ and logs/
 ```
 
+> `make test` is a developer tool that calls the Anthropic API directly.
+> End-users of the plugin do not need an API key.
+
+## How it works
+
+StackLens uses **MCP sampling**: when you call `explain_error`, the server sends a `sampling/createMessage` request back to the Claude host (Desktop or Code). The host runs the inference using its own Claude connection and returns the result. No separate API key is needed.
+
 ## Troubleshooting
 
 | Problem | Fix |
 |---------|-----|
-| `ANTHROPIC_API_KEY not set` | Add it to the `env` block in claude_desktop_config.json |
 | Tool not appearing in Claude | Restart Claude Desktop completely |
 | `JSON parse error` | Retry — the model returned non-JSON |
 | `Module not found` | Run `make build` first |
 | Batch mode timeout | Reduce batch size below 5 |
+| `Client does not support sampling` | Upgrade Claude Desktop / Claude Code to a recent version |
 
 ## Contributing
 

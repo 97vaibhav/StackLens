@@ -1,6 +1,16 @@
+/**
+ * Developer test harness — calls the Anthropic API directly.
+ * Requires ANTHROPIC_API_KEY in .env (for local dev only).
+ * End-users of the plugin do NOT need an API key; the server uses MCP sampling.
+ */
 import "dotenv/config";
-import { explainError } from "./tools/explainError.js";
+import Anthropic from "@anthropic-ai/sdk";
+import { SYSTEM_PROMPT } from "./prompts/systemPrompt.js";
+import { ErrorResultSchema } from "./schemas/errorResult.js";
+import { detectLanguage } from "./tools/detectLanguage.js";
 import { formatResult } from "./utils/formatter.js";
+
+const client = new Anthropic();
 
 const TEST_ERRORS = [
   {
@@ -28,7 +38,23 @@ async function runTests() {
     console.error(`TEST: ${test.name}`);
     console.error("=".repeat(60));
     try {
-      const result = await explainError(test.text);
+      const lang = detectLanguage(test.text);
+      const userMessage = `Language hint: ${lang}\n\nError to analyze:\n\`\`\`\n${test.text.trim()}\n\`\`\``;
+
+      const response = await client.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: userMessage }],
+      });
+
+      const rawText = response.content
+        .filter((b) => b.type === "text")
+        .map((b) => (b as { type: "text"; text: string }).text)
+        .join("");
+
+      const cleaned = rawText.replace(/```json|```/g, "").trim();
+      const result = ErrorResultSchema.parse(JSON.parse(cleaned));
       process.stdout.write(formatResult(result) + "\n");
     } catch (err) {
       console.error("FAILED:", err);

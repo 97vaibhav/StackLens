@@ -87,7 +87,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     try {
-      const result = await explainError(error_text, language_hint);
+      const result = await explainError(error_text, server, language_hint);
       const formatted = formatResult(result);
       logResult(error_text, result);
 
@@ -128,7 +128,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
-    const results = await Promise.allSettled(errors.map((e) => explainError(e)));
+    const results = await Promise.allSettled(errors.map((e) => explainError(e, server)));
 
     const content = results.map((r, i) => {
       if (r.status === "fulfilled") {

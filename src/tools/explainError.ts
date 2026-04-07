@@ -1,12 +1,13 @@
-import Anthropic from "@anthropic-ai/sdk";
+// eslint-disable-next-line @typescript-eslint/no-deprecated
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { SYSTEM_PROMPT } from "../prompts/systemPrompt.js";
 import { ErrorResultSchema, type ErrorResult } from "../schemas/errorResult.js";
 import { detectLanguage } from "./detectLanguage.js";
 
-const client = new Anthropic();
-
 export async function explainError(
   errorText: string,
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  server: Server,
   hintLanguage?: string
 ): Promise<ErrorResult> {
   const detectedLang = hintLanguage ?? detectLanguage(errorText);
@@ -18,17 +19,13 @@ Error to analyze:
 ${errorText.trim()}
 \`\`\``;
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 1024,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: userMessage }],
+  const response = await server.createMessage({
+    messages: [{ role: "user", content: { type: "text", text: userMessage } }],
+    systemPrompt: SYSTEM_PROMPT,
+    maxTokens: 1024,
   });
 
-  const rawText = response.content
-    .filter((b) => b.type === "text")
-    .map((b) => (b as { type: "text"; text: string }).text)
-    .join("");
+  const rawText = response.content.type === "text" ? response.content.text : "";
 
   const cleaned = rawText.replace(/```json|```/g, "").trim();
 

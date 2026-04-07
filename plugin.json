@@ -30,9 +30,7 @@
       "description": "Slash command to quickly explain an error"
     }
   ],
-  "required_env": [
-    "ANTHROPIC_API_KEY"
-  ],
+  "required_env": [],
   "categories": [
     "developer-tools",
     "debugging"
