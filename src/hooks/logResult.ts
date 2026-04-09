@@ -5,7 +5,7 @@ import type { ErrorResult } from "../schemas/errorResult.js";
 
 export function logResult(input: string, output: ErrorResult): void {
   const logDir = path.join(process.cwd(), "logs");
-  fs.mkdirSync(logDir, { recursive: true });
+  fs.mkdirSync(logDir, { recursive: true, mode: 0o700 });
 
   // Hash input for deduplication — never log raw error text (may contain credentials/PII)
   const inputHash = crypto.createHash("sha256").update(input).digest("hex").slice(0, 12);

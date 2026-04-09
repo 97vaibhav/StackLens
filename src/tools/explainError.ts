@@ -12,18 +12,23 @@ export async function explainError(
 ): Promise<ErrorResult> {
   const detectedLang = hintLanguage ?? detectLanguage(errorText);
 
+  // JSON-encode the error text to prevent prompt injection via embedded instructions
   const userMessage = `Language hint: ${detectedLang}
 
-Error to analyze:
-\`\`\`
-${errorText.trim()}
-\`\`\``;
+Error to analyze (JSON-encoded plain text):
+${JSON.stringify(errorText.trim())}`;
 
-  const response = await server.createMessage({
-    messages: [{ role: "user", content: { type: "text", text: userMessage } }],
-    systemPrompt: SYSTEM_PROMPT,
-    maxTokens: 1024,
-  });
+  const TIMEOUT_MS = 30_000;
+  const response = await Promise.race([
+    server.createMessage({
+      messages: [{ role: "user", content: { type: "text", text: userMessage } }],
+      systemPrompt: SYSTEM_PROMPT,
+      maxTokens: 1024,
+    }),
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Request timed out")), TIMEOUT_MS)
+    ),
+  ]);
 
   const rawText = response.content.type === "text" ? response.content.text : "";
 
@@ -32,11 +37,8 @@ ${errorText.trim()}
   let parsed: unknown;
   try {
     parsed = JSON.parse(cleaned);
-  } catch (err) {
-    throw new Error(
-      `Model returned non-JSON response: ${err instanceof SyntaxError ? err.message : String(err)}. ` +
-      `Preview: ${cleaned.slice(0, 150)}`
-    );
+  } catch {
+    throw new Error("Model returned an unexpected response format. Please try again.");
   }
 
   return ErrorResultSchema.parse(parsed);

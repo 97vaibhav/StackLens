@@ -72,6 +72,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     const validation = validateErrorInput(error_text);
     if (!validation.valid) {
+      console.error(`[StackLens] Validation rejected: ${validation.reason}`);
       return {
         content: [{ type: "text", text: `StackLens: ${validation.reason}` }],
         isError: true,
@@ -80,6 +81,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     const langValidation = validateLanguageHint(language_hint);
     if (!langValidation.valid) {
+      console.error(`[StackLens] Language hint rejected: ${langValidation.reason}`);
       return {
         content: [{ type: "text", text: `StackLens: ${langValidation.reason}` }],
         isError: true,
@@ -96,16 +98,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           { type: "text", text: formatted },
           {
             type: "text",
-            text: `\n\n<details><summary>Raw JSON</summary>\n\n\`\`\`json\n${JSON.stringify(result, null, 2)}\n\`\`\`\n\n</details>`,
+            text: `\n\n**Raw JSON:**\n\`\`\`json\n${JSON.stringify(result, null, 2)}\n\`\`\``,
           },
         ],
       };
     } catch (err) {
+      console.error("[StackLens] Analysis failed:", err instanceof Error ? err.message : String(err));
       return {
         content: [
           {
             type: "text",
-            text: `StackLens failed to analyze this error: ${err instanceof Error ? err.message : String(err)}`,
+            text: "StackLens could not analyze this error. Please check that your stack trace is complete and try again.",
           },
         ],
         isError: true,
@@ -135,9 +138,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         logResult(errors[i], r.value);
         return { type: "text" as const, text: `### Error ${i + 1}\n\n${formatResult(r.value)}` };
       }
+      console.error(`[StackLens] Batch item ${i + 1} failed:`, r.reason instanceof Error ? r.reason.message : String(r.reason));
       return {
         type: "text" as const,
-        text: `### Error ${i + 1}\n\nFailed: ${r.reason instanceof Error ? r.reason.message : String(r.reason)}`,
+        text: `### Error ${i + 1}\n\nAnalysis failed for this item. Please try it individually using explain_error.`,
       };
     });
 
@@ -191,7 +195,9 @@ server.setRequestHandler(GetPromptRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("StackLens MCP server running on stdio");
+  if (process.env.DEBUG) {
+    console.error("StackLens MCP server running on stdio");
+  }
 }
 
 main().catch((err) => {
