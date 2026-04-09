@@ -25,7 +25,7 @@
     "stack-trace",
     "developer-tools"
   ],
-  "author": "",
+  "author": "97vaibhav",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.10.0",

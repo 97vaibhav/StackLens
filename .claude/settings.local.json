@@ -1,0 +1,11 @@
+{
+  "enabledMcpjsonServers": [
+    "code-review-graph",
+    "stacklens"
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(npm view:*)"
+    ]
+  }
+}
